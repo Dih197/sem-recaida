@@ -9,19 +9,15 @@ interface OptionCardProps {
 
 export function OptionCard({ label, description, selected, onClick }: OptionCardProps) {
   return (
-    <button
-      onClick={onClick}
-      className={`w-full text-left p-4 rounded-xl border transition-all duration-200 ${
-        selected
-          ? "border-brand-primary bg-brand-primary/10 ring-1 ring-brand-primary/30"
-          : "border-white/10 bg-brand-surface-light hover:border-white/20"
-      }`}
-    >
-      <span className={`font-medium ${selected ? "text-brand-primary" : "text-white"}`}>
+    <button onClick={onClick} className={`option-mystic ${selected ? "selected" : ""}`}>
+      <span className={`font-semibold text-sm tracking-wide ${selected ? "text-[var(--color-mystic-light)]" : "text-[var(--color-text)]"}`}
+        style={{ fontFamily: "'Cinzel', serif" }}>
         {label}
       </span>
       {description && (
-        <p className="text-sm text-slate-400 mt-1">{description}</p>
+        <p className="text-xs text-[var(--color-text-muted)] mt-1" style={{ fontFamily: "'Raleway', sans-serif" }}>
+          {description}
+        </p>
       )}
     </button>
   );

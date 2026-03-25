@@ -17,108 +17,73 @@ export default function RegistroPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
       const res = await fetch("/api/auth/registro", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
       });
-
       const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "Erro ao criar conta");
-        setLoading(false);
-        return;
-      }
-
-      // Auto login after registration
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
-
-      if (result?.error) {
-        setError("Conta criada, mas erro ao entrar. Tente fazer login.");
-        setLoading(false);
-        return;
-      }
-
+      if (!res.ok) { setError(data.error || "Erro ao criar conta"); setLoading(false); return; }
+      const result = await signIn("credentials", { email, password, redirect: false });
+      if (result?.error) { setError("Conta criada, mas erro ao entrar."); setLoading(false); return; }
       router.push("/onboarding");
       router.refresh();
-    } catch {
-      setError("Erro de conexão. Tente novamente.");
-      setLoading(false);
-    }
+    } catch { setError("Erro de conexão."); setLoading(false); }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
+    <div className="min-h-screen flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-brand-primary to-brand-secondary bg-clip-text text-transparent">
+        <div className="text-center mb-10 animate-in">
+          <div className="inline-block mb-4">
+            <span className="text-5xl" style={{ filter: "drop-shadow(0 0 20px rgba(236, 72, 153, 0.4))" }}>
+              ✦
+            </span>
+          </div>
+          <h1 className="text-4xl font-bold text-gradient-mystic tracking-wide">
             Sem Recaída
           </h1>
-          <p className="text-slate-400 mt-2">
+          <div className="divider-mystic w-32 mx-auto my-4" />
+          <p className="text-[var(--color-text-muted)] text-sm" style={{ fontFamily: "'Playfair Display', serif", fontStyle: "italic" }}>
             Comece sua jornada de volta para si
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="card space-y-4">
+        <form onSubmit={handleSubmit} className="card-mystic space-y-5 animate-in animate-in-delay-2">
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Nome</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="input-field"
-              placeholder="Como quer ser chamado(a)?"
-              required
-            />
+            <label className="block text-xs text-[var(--color-text-muted)] mb-2 tracking-wider uppercase">Nome</label>
+            <input type="text" value={name} onChange={(e) => setName(e.target.value)}
+              className="input-mystic" placeholder="Como quer ser chamado(a)?" required />
           </div>
-
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="input-field"
-              placeholder="seu@email.com"
-              required
-            />
+            <label className="block text-xs text-[var(--color-text-muted)] mb-2 tracking-wider uppercase">Email</label>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+              className="input-mystic" placeholder="seu@email.com" required />
           </div>
-
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Senha</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="input-field"
-              placeholder="Mínimo 6 caracteres"
-              minLength={6}
-              required
-            />
+            <label className="block text-xs text-[var(--color-text-muted)] mb-2 tracking-wider uppercase">Senha</label>
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}
+              className="input-mystic" placeholder="Mínimo 6 caracteres" minLength={6} required />
           </div>
 
           {error && (
-            <p className="text-red-400 text-sm">{error}</p>
+            <div className="text-red-400 text-sm text-center py-2 px-4 rounded-xl bg-red-500/5 border border-red-500/10">
+              {error}
+            </div>
           )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn-primary w-full disabled:opacity-50"
-          >
-            {loading ? "Criando conta..." : "Criar minha conta"}
+          <button type="submit" disabled={loading} className="btn-mystic w-full disabled:opacity-50 text-center">
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="spinner-mystic !w-5 !h-5 !border-2" /> Criando...
+              </span>
+            ) : "Iniciar Jornada"}
           </button>
 
-          <p className="text-center text-sm text-slate-400">
+          <p className="text-center text-sm text-[var(--color-text-muted)]">
             Já tem conta?{" "}
-            <Link href="/login" className="text-brand-primary hover:underline">
+            <Link href="/login" className="text-[var(--color-mystic-light)] hover:text-[var(--color-flame-light)] transition-colors">
               Entrar
             </Link>
           </p>

@@ -2,40 +2,758 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=Raleway:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+
+:root {
+  --color-void: #05030a;
+  --color-abyss: #0a0614;
+  --color-deep: #110c20;
+  --color-surface: #16102a;
+  --color-card: #1c1535;
+  --color-card-hover: #231b42;
+  --color-mystic: #8b5cf6;
+  --color-mystic-light: #a78bfa;
+  --color-flame: #ec4899;
+  --color-flame-light: #f472b6;
+  --color-gold: #fbbf24;
+  --color-gold-light: #fde68a;
+  --color-cyan: #22d3ee;
+  --color-emerald: #34d399;
+  --color-danger: #ef4444;
+  --color-text: #f1e8ff;
+  --color-text-muted: #8b7faa;
+  --color-text-dim: #5a4f75;
+  --glow-mystic: 0 0 20px rgba(139, 92, 246, 0.3), 0 0 40px rgba(139, 92, 246, 0.1);
+  --glow-flame: 0 0 20px rgba(236, 72, 153, 0.3), 0 0 40px rgba(236, 72, 153, 0.1);
+  --glow-gold: 0 0 20px rgba(251, 191, 36, 0.3), 0 0 40px rgba(251, 191, 36, 0.1);
+  --glow-danger: 0 0 20px rgba(239, 68, 68, 0.4), 0 0 60px rgba(239, 68, 68, 0.15);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-mystic) var(--color-deep);
+}
 
 @layer base {
   body {
-    @apply bg-brand-bg text-white antialiased;
+    @apply antialiased;
+    background: var(--color-void);
+    color: var(--color-text);
+    font-family: 'Raleway', sans-serif;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.02em;
   }
 }
 
+/* ═══════════════════════════════════════════════
+   MYSTICAL BACKGROUND
+   ═══════════════════════════════════════════════ */
+
+.bg-mystical {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -20%, rgba(139, 92, 246, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(236, 72, 153, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 50% at 20% 60%, rgba(34, 211, 238, 0.05) 0%, transparent 50%),
+    var(--color-void);
+}
+
+.bg-mystical::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.15) 0%, transparent 100%),
+    radial-gradient(1px 1px at 30% 70%, rgba(255,255,255,0.1) 0%, transparent 100%),
+    radial-gradient(1px 1px at 50% 40%, rgba(255,255,255,0.12) 0%, transparent 100%),
+    radial-gradient(1px 1px at 70% 10%, rgba(255,255,255,0.08) 0%, transparent 100%),
+    radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,0.1) 0%, transparent 100%),
+    radial-gradient(2px 2px at 15% 85%, rgba(139, 92, 246, 0.3) 0%, transparent 100%),
+    radial-gradient(2px 2px at 85% 25%, rgba(236, 72, 153, 0.2) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 45% 55%, rgba(251, 191, 36, 0.2) 0%, transparent 100%);
+  animation: twinkle 8s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
+}
+
+/* ═══════════════════════════════════════════════
+   FLOATING PARTICLES
+   ═══════════════════════════════════════════════ */
+
+.particles {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  animation: float-up linear infinite;
+  opacity: 0;
+}
+
+.particle:nth-child(1) { left: 10%; animation-duration: 12s; animation-delay: 0s; background: var(--color-mystic); }
+.particle:nth-child(2) { left: 25%; animation-duration: 15s; animation-delay: 2s; background: var(--color-flame); width: 2px; height: 2px; }
+.particle:nth-child(3) { left: 40%; animation-duration: 10s; animation-delay: 4s; background: var(--color-gold); }
+.particle:nth-child(4) { left: 55%; animation-duration: 14s; animation-delay: 1s; background: var(--color-cyan); width: 2px; height: 2px; }
+.particle:nth-child(5) { left: 70%; animation-duration: 11s; animation-delay: 3s; background: var(--color-mystic-light); }
+.particle:nth-child(6) { left: 85%; animation-duration: 13s; animation-delay: 5s; background: var(--color-flame-light); width: 2px; height: 2px; }
+.particle:nth-child(7) { left: 35%; animation-duration: 16s; animation-delay: 7s; background: var(--color-gold-light); }
+.particle:nth-child(8) { left: 65%; animation-duration: 9s; animation-delay: 6s; background: var(--color-mystic); width: 4px; height: 4px; }
+
+@keyframes float-up {
+  0% { transform: translateY(100vh) scale(0); opacity: 0; }
+  10% { opacity: 0.8; }
+  90% { opacity: 0.3; }
+  100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+}
+
+/* ═══════════════════════════════════════════════
+   CARDS & GLASS MORPHISM
+   ═══════════════════════════════════════════════ */
+
 @layer components {
-  .card {
-    @apply bg-brand-surface rounded-2xl p-6 border border-white/5;
+  .card-mystic {
+    background: linear-gradient(135deg, rgba(28, 21, 53, 0.8), rgba(16, 12, 32, 0.9));
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(139, 92, 246, 0.12);
+    border-radius: 20px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .btn-primary {
-    @apply bg-brand-primary hover:bg-brand-primary/90 text-white font-medium py-3 px-6 rounded-xl transition-all duration-200;
+  .card-mystic::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), transparent 50%, rgba(236, 72, 153, 0.1));
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
   }
 
-  .btn-secondary {
-    @apply bg-brand-surface-light hover:bg-brand-surface-light/80 text-white font-medium py-3 px-6 rounded-xl transition-all duration-200 border border-white/10;
+  .card-mystic:hover {
+    border-color: rgba(139, 92, 246, 0.25);
+    transform: translateY(-2px);
+    box-shadow: var(--glow-mystic);
+  }
+
+  .card-flame {
+    background: linear-gradient(135deg, rgba(60, 15, 35, 0.6), rgba(30, 10, 20, 0.8));
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 20px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card-flame:hover {
+    border-color: rgba(239, 68, 68, 0.35);
+    box-shadow: var(--glow-danger);
+  }
+
+  .card-gold {
+    background: linear-gradient(135deg, rgba(50, 40, 10, 0.5), rgba(30, 20, 5, 0.7));
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(251, 191, 36, 0.15);
+    border-radius: 20px;
+    padding: 1.5rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card-gold:hover {
+    border-color: rgba(251, 191, 36, 0.3);
+    box-shadow: var(--glow-gold);
+  }
+
+  /* ═══════════════════════════════════════════════
+     BUTTONS
+     ═══════════════════════════════════════════════ */
+
+  .btn-mystic {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9, #8b5cf6);
+    color: white;
+    font-family: 'Cinzel', serif;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    padding: 0.875rem 2rem;
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+  }
+
+  .btn-mystic::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+  }
+
+  .btn-mystic:hover::before {
+    transform: translateX(100%);
+  }
+
+  .btn-mystic:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
+  }
+
+  .btn-mystic:active {
+    transform: translateY(0);
   }
 
   .btn-emergency {
-    @apply bg-brand-emergency hover:bg-red-700 text-white font-bold py-4 px-8 rounded-2xl transition-all duration-200 shadow-lg shadow-red-900/30;
+    background: linear-gradient(135deg, #dc2626, #b91c1c, #ef4444);
+    color: white;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 1.125rem 2rem;
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(220, 38, 38, 0.4);
+    animation: pulse-emergency 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-emergency {
+    0%, 100% { box-shadow: 0 4px 20px rgba(220, 38, 38, 0.4); }
+    50% { box-shadow: 0 4px 35px rgba(220, 38, 38, 0.6), 0 0 60px rgba(220, 38, 38, 0.2); }
+  }
+
+  .btn-secondary {
+    background: rgba(28, 21, 53, 0.6);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    color: var(--color-text);
+    font-family: 'Raleway', sans-serif;
+    font-weight: 500;
+    padding: 0.875rem 2rem;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+
+  .btn-secondary:hover {
+    border-color: rgba(139, 92, 246, 0.4);
+    background: rgba(28, 21, 53, 0.8);
   }
 
   .btn-tarot {
-    @apply bg-brand-tarot hover:bg-violet-600 text-white font-medium py-3 px-6 rounded-xl transition-all duration-200;
+    background: linear-gradient(135deg, #6d28d9, #7c3aed, #a855f7);
+    color: white;
+    font-family: 'Cinzel', serif;
+    font-weight: 600;
+    padding: 0.875rem 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(109, 40, 217, 0.4);
+    transition: all 0.3s ease;
   }
 
-  .input-field {
-    @apply w-full bg-brand-surface-light border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-primary/50 focus:border-brand-primary/50 transition-all;
+  .btn-tarot:hover {
+    box-shadow: 0 8px 30px rgba(109, 40, 217, 0.5), 0 0 50px rgba(168, 85, 247, 0.15);
+    transform: translateY(-2px);
   }
 
-  .textarea-field {
-    @apply input-field resize-none min-h-[120px];
+  /* ═══════════════════════════════════════════════
+     INPUTS
+     ═══════════════════════════════════════════════ */
+
+  .input-mystic {
+    width: 100%;
+    background: rgba(16, 12, 32, 0.6);
+    border: 1px solid rgba(139, 92, 246, 0.15);
+    border-radius: 14px;
+    padding: 0.875rem 1.25rem;
+    color: var(--color-text);
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.95rem;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
   }
+
+  .input-mystic::placeholder {
+    color: var(--color-text-dim);
+  }
+
+  .input-mystic:focus {
+    outline: none;
+    border-color: rgba(139, 92, 246, 0.4);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1), var(--glow-mystic);
+  }
+
+  .textarea-mystic {
+    @apply input-mystic;
+    resize: none;
+    min-height: 140px;
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   TAROT CARD FLIP ANIMATION
+   ═══════════════════════════════════════════════ */
+
+.tarot-scene {
+  perspective: 1200px;
+  width: 220px;
+  height: 340px;
+  margin: 0 auto;
+}
+
+.tarot-card {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.tarot-card.flipped {
+  transform: rotateY(180deg);
+}
+
+.tarot-card.shuffling {
+  animation: shuffle 0.6s ease-in-out;
+}
+
+@keyframes shuffle {
+  0% { transform: rotateZ(0deg) translateX(0); }
+  25% { transform: rotateZ(-8deg) translateX(-30px); }
+  50% { transform: rotateZ(5deg) translateX(20px); }
+  75% { transform: rotateZ(-3deg) translateX(-10px); }
+  100% { transform: rotateZ(0deg) translateX(0); }
+}
+
+.tarot-face,
+.tarot-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.tarot-back {
+  background: linear-gradient(135deg, #1a0a30, #2d1055, #1a0a30);
+  border: 2px solid rgba(139, 92, 246, 0.3);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 0 60px rgba(139, 92, 246, 0.1);
+}
+
+.tarot-back::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  border-radius: 12px;
+  background: repeating-conic-gradient(
+    rgba(139, 92, 246, 0.05) 0% 25%,
+    transparent 0% 50%
+  ) 50% / 20px 20px;
+}
+
+.tarot-back::after {
+  content: '✦';
+  font-size: 4rem;
+  color: rgba(251, 191, 36, 0.4);
+  text-shadow: 0 0 30px rgba(251, 191, 36, 0.3);
+  animation: rotate-star 10s linear infinite;
+}
+
+@keyframes rotate-star {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.tarot-face {
+  transform: rotateY(180deg);
+  background: linear-gradient(180deg, #1a0a35, #0d0520);
+  border: 2px solid rgba(251, 191, 36, 0.3);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(251, 191, 36, 0.1);
+  flex-direction: column;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.tarot-face .card-name {
+  font-family: 'Cinzel', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color-gold);
+  text-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+  margin-top: auto;
+}
+
+.tarot-face .card-symbol {
+  font-size: 5rem;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.4));
+  animation: card-glow 3s ease-in-out infinite alternate;
+}
+
+@keyframes card-glow {
+  from { filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.4)); }
+  to { filter: drop-shadow(0 0 25px rgba(251, 191, 36, 0.6)); }
+}
+
+/* Reveal burst effect */
+.tarot-card.flipped .tarot-face::before {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.3) 0%, transparent 70%);
+  animation: reveal-burst 1s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes reveal-burst {
+  0% { opacity: 1; transform: scale(0.3); }
+  100% { opacity: 0; transform: scale(2); }
+}
+
+/* ═══════════════════════════════════════════════
+   STREAK COUNTER (RPG STYLE)
+   ═══════════════════════════════════════════════ */
+
+.streak-ring {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin: 0 auto;
+}
+
+.streak-ring svg {
+  transform: rotate(-90deg);
+  filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.3));
+}
+
+.streak-ring .ring-bg {
+  stroke: rgba(139, 92, 246, 0.1);
+}
+
+.streak-ring .ring-progress {
+  stroke: url(#streakGradient);
+  stroke-dasharray: 440;
+  stroke-dashoffset: 440;
+  animation: fill-ring 2s ease-out forwards;
+  animation-delay: 0.5s;
+}
+
+@keyframes fill-ring {
+  to { stroke-dashoffset: 100; }
+}
+
+.streak-number {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cinzel', serif;
+}
+
+.streak-number .number {
+  font-size: 3rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--color-mystic-light), var(--color-flame-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1;
+}
+
+.streak-number .label {
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-top: 0.25rem;
+  font-family: 'Raleway', sans-serif;
+}
+
+/* ═══════════════════════════════════════════════
+   RISK BADGES
+   ═══════════════════════════════════════════════ */
+
+.risk-low {
+  background: linear-gradient(135deg, rgba(52, 211, 153, 0.15), rgba(52, 211, 153, 0.05));
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  color: #34d399;
+  box-shadow: 0 0 15px rgba(52, 211, 153, 0.1);
+}
+
+.risk-medium {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(251, 191, 36, 0.05));
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  color: #fbbf24;
+  box-shadow: 0 0 15px rgba(251, 191, 36, 0.1);
+}
+
+.risk-high {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.05));
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.15);
+  animation: pulse-risk 2s ease-in-out infinite;
+}
+
+@keyframes pulse-risk {
+  0%, 100% { box-shadow: 0 0 15px rgba(239, 68, 68, 0.15); }
+  50% { box-shadow: 0 0 25px rgba(239, 68, 68, 0.25); }
+}
+
+/* ═══════════════════════════════════════════════
+   EMOTION GRID
+   ═══════════════════════════════════════════════ */
+
+.emotion-orb {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 0.5rem;
+  border-radius: 16px;
+  background: rgba(16, 12, 32, 0.5);
+  border: 1px solid rgba(139, 92, 246, 0.1);
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.emotion-orb:hover {
+  border-color: rgba(139, 92, 246, 0.3);
+  background: rgba(28, 21, 53, 0.7);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: var(--glow-mystic);
+}
+
+.emotion-orb.selected {
+  border-color: rgba(139, 92, 246, 0.5);
+  background: rgba(139, 92, 246, 0.1);
+  box-shadow: var(--glow-mystic);
+  animation: selected-pulse 2s ease-in-out infinite;
+}
+
+@keyframes selected-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
+  50% { box-shadow: 0 0 30px rgba(139, 92, 246, 0.4), 0 0 60px rgba(139, 92, 246, 0.1); }
+}
+
+.emotion-orb .emoji {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  transition: transform 0.3s ease;
+}
+
+.emotion-orb:hover .emoji {
+  transform: scale(1.2);
+}
+
+/* ═══════════════════════════════════════════════
+   PROGRESS BAR (XP STYLE)
+   ═══════════════════════════════════════════════ */
+
+.xp-bar {
+  height: 8px;
+  background: rgba(139, 92, 246, 0.1);
+  border-radius: 100px;
+  overflow: hidden;
+  position: relative;
+}
+
+.xp-bar-fill {
+  height: 100%;
+  border-radius: 100px;
+  background: linear-gradient(90deg, var(--color-mystic), var(--color-flame), var(--color-gold));
+  background-size: 200% 100%;
+  animation: xp-shimmer 3s ease-in-out infinite;
+  transition: width 1s ease-out;
+}
+
+@keyframes xp-shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ═══════════════════════════════════════════════
+   ENTRANCE ANIMATIONS
+   ═══════════════════════════════════════════════ */
+
+.animate-in {
+  animation: fade-slide-up 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-in-delay-1 { animation-delay: 0.1s; }
+.animate-in-delay-2 { animation-delay: 0.2s; }
+.animate-in-delay-3 { animation-delay: 0.3s; }
+.animate-in-delay-4 { animation-delay: 0.4s; }
+.animate-in-delay-5 { animation-delay: 0.5s; }
+.animate-in-delay-6 { animation-delay: 0.6s; }
+
+@keyframes fade-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  opacity: 0;
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ═══════════════════════════════════════════════
+   INTENSITY SLIDER
+   ═══════════════════════════════════════════════ */
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 100px;
+  background: rgba(139, 92, 246, 0.1);
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-mystic), var(--color-flame));
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+  transition: box-shadow 0.2s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 25px rgba(139, 92, 246, 0.6);
+}
+
+/* ═══════════════════════════════════════════════
+   TITLE GRADIENT
+   ═══════════════════════════════════════════════ */
+
+.text-gradient-mystic {
+  background: linear-gradient(135deg, var(--color-mystic-light), var(--color-flame-light), var(--color-gold));
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shift 6s ease infinite;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, var(--color-gold), var(--color-gold-light), #fff5cc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ═══════════════════════════════════════════════
+   DIVIDER
+   ═══════════════════════════════════════════════ */
+
+.divider-mystic {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.3), rgba(236, 72, 153, 0.2), transparent);
+}
+
+/* ═══════════════════════════════════════════════
+   LOADING SPINNER
+   ═══════════════════════════════════════════════ */
+
+.spinner-mystic {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(139, 92, 246, 0.1);
+  border-top-color: var(--color-mystic);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ═══════════════════════════════════════════════
+   OPTION CARD (ONBOARDING)
+   ═══════════════════════════════════════════════ */
+
+.option-mystic {
+  position: relative;
+  padding: 1.125rem 1.25rem;
+  border-radius: 16px;
+  background: rgba(16, 12, 32, 0.5);
+  border: 1px solid rgba(139, 92, 246, 0.1);
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: left;
+  width: 100%;
+}
+
+.option-mystic:hover {
+  border-color: rgba(139, 92, 246, 0.3);
+  background: rgba(28, 21, 53, 0.6);
+  transform: translateX(4px);
+}
+
+.option-mystic.selected {
+  border-color: rgba(139, 92, 246, 0.5);
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.05));
+  box-shadow: var(--glow-mystic);
+}
+
+.option-mystic.selected::after {
+  content: '✦';
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-gold);
+  font-size: 1.2rem;
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
 }

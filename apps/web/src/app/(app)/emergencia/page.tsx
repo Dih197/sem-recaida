@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { EmergencyAnalysis } from "@sem-recaida/shared";
-import { EMOTION_SOURCE_LABELS, RISK_LABELS, RISK_COLORS } from "@sem-recaida/shared";
+import { EMOTION_SOURCE_LABELS, RISK_LABELS } from "@sem-recaida/shared";
 
 export default function EmergenciaPage() {
   const router = useRouter();
@@ -14,52 +14,67 @@ export default function EmergenciaPage() {
   async function handleAnalyze() {
     if (!draftMessage.trim()) return;
     setStep("analyzing");
-
     try {
       const res = await fetch("/api/emergencia", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ draftMessage }),
       });
-
       const data = await res.json();
-      if (data.analysis) {
-        setAnalysis(data.analysis);
-      }
+      if (data.analysis) setAnalysis(data.analysis);
       setStep("result");
-    } catch {
-      setStep("input");
-    }
+    } catch { setStep("input"); }
   }
 
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <div className="text-5xl mb-3">🚨</div>
-        <h1 className="text-2xl font-bold text-red-400">Botão de Emergência</h1>
-        <p className="text-slate-400 text-sm mt-1">
-          Antes de mandar aquela mensagem, cola ela aqui
+    <div className="space-y-6 pb-4">
+      {/* Header */}
+      <div className="text-center animate-in">
+        <div className="relative inline-block mb-3">
+          <span
+            className="text-6xl block"
+            style={{
+              filter: "drop-shadow(0 0 30px rgba(239, 68, 68, 0.5))",
+              animation: "pulse-emergency 2s ease-in-out infinite",
+            }}
+          >
+            ⚡
+          </span>
+          <div
+            className="absolute inset-0 -m-8 rounded-full"
+            style={{
+              background: "radial-gradient(circle, rgba(239, 68, 68, 0.08) 0%, transparent 70%)",
+              animation: "pulse-emergency 2s ease-in-out infinite",
+            }}
+          />
+        </div>
+        <h1 className="text-3xl font-bold text-red-400 tracking-wider">
+          Emergência
+        </h1>
+        <p className="text-[var(--color-text-muted)] text-sm mt-2" style={{ fontFamily: "'Playfair Display', serif", fontStyle: "italic" }}>
+          Antes de mandar aquela mensagem, cole ela aqui
         </p>
       </div>
 
-      {/* Input Step */}
+      {/* Input */}
       {step === "input" && (
-        <div className="space-y-4">
+        <div className="space-y-4 animate-in animate-in-delay-2">
           <textarea
             value={draftMessage}
             onChange={(e) => setDraftMessage(e.target.value)}
-            className="textarea-field min-h-[160px] border-red-900/30"
+            className="textarea-mystic"
+            style={{ borderColor: "rgba(239, 68, 68, 0.15)", minHeight: "180px" }}
             placeholder="Cole aqui a mensagem que você queria mandar..."
-            rows={6}
+            rows={7}
           />
           <button
             onClick={handleAnalyze}
             disabled={!draftMessage.trim()}
-            className="btn-emergency w-full disabled:opacity-50"
+            className="btn-emergency w-full disabled:opacity-40 text-center"
           >
-            Analisar meu impulso
+            Analisar Meu Impulso
           </button>
-          <p className="text-center text-xs text-slate-500">
+          <p className="text-center text-xs text-[var(--color-text-dim)]" style={{ fontFamily: "'Playfair Display', serif", fontStyle: "italic" }}>
             Ninguém vai ver isso. É só entre você e o app.
           </p>
         </div>
@@ -67,73 +82,76 @@ export default function EmergenciaPage() {
 
       {/* Analyzing */}
       {step === "analyzing" && (
-        <div className="card text-center py-12">
-          <div className="animate-pulse text-4xl mb-4">🔍</div>
-          <p className="text-slate-300">Analisando seu impulso...</p>
-          <p className="text-slate-500 text-sm mt-1">Respira fundo enquanto isso</p>
+        <div className="card-flame text-center py-16 animate-in">
+          <div className="spinner-mystic mx-auto mb-4" style={{ borderTopColor: "#ef4444", borderColor: "rgba(239, 68, 68, 0.15)" }} />
+          <p className="text-red-300 tracking-wider" style={{ fontFamily: "'Cinzel', serif" }}>
+            Analisando seu impulso...
+          </p>
+          <p className="text-[var(--color-text-dim)] text-xs mt-2" style={{ fontFamily: "'Playfair Display', serif", fontStyle: "italic" }}>
+            Respire fundo enquanto isso
+          </p>
         </div>
       )}
 
       {/* Result */}
       {step === "result" && analysis && (
         <div className="space-y-4">
-          {/* Impulse Source */}
-          <div className="card text-center border-red-900/20">
-            <p className="text-sm text-slate-400 mb-1">Essa mensagem veio de</p>
-            <p className="text-xl font-semibold text-red-400">
+          <div className="card-flame text-center py-5 animate-in">
+            <p className="text-xs text-red-400/70 tracking-wider uppercase mb-1" style={{ fontFamily: "'Cinzel', serif" }}>
+              Essa mensagem veio de
+            </p>
+            <p className="text-2xl font-bold text-red-300" style={{ fontFamily: "'Cinzel', serif" }}>
               {EMOTION_SOURCE_LABELS[analysis.impulseSource as keyof typeof EMOTION_SOURCE_LABELS]}
             </p>
           </div>
 
-          {/* Why Not Send */}
-          <div className="card">
-            <p className="text-sm text-red-400 font-medium mb-2">Por que não mandar agora</p>
-            <p className="text-slate-300">{analysis.whyNotSend}</p>
+          <div className="card-mystic animate-in animate-in-delay-1">
+            <p className="text-xs text-red-400 tracking-wider uppercase mb-2" style={{ fontFamily: "'Cinzel', serif" }}>
+              Por que não mandar agora
+            </p>
+            <p className="text-[var(--color-text)] text-sm leading-relaxed">{analysis.whyNotSend}</p>
           </div>
 
-          {/* Regret Risk */}
-          <div className="card text-center">
-            <p className="text-sm text-slate-400 mb-1">Risco de arrependimento</p>
-            <span
-              className="text-lg font-bold px-4 py-1 rounded-full inline-block"
-              style={{
-                backgroundColor: `${RISK_COLORS[analysis.regretRisk as keyof typeof RISK_COLORS]}20`,
-                color: RISK_COLORS[analysis.regretRisk as keyof typeof RISK_COLORS],
-              }}
-            >
+          <div className="card-mystic text-center animate-in animate-in-delay-2">
+            <p className="text-xs text-[var(--color-text-dim)] tracking-wider uppercase mb-2">Risco de arrependimento</p>
+            <span className={`inline-block text-sm px-4 py-1.5 rounded-full font-semibold tracking-wide risk-${analysis.regretRisk.toLowerCase()}`}>
               {RISK_LABELS[analysis.regretRisk as keyof typeof RISK_LABELS]}
             </span>
           </div>
 
-          {/* Vent Version */}
-          <div className="card bg-gradient-to-br from-brand-primary/10 to-brand-secondary/10 border-brand-primary/20">
-            <p className="text-sm text-brand-primary font-medium mb-2">Desabafo privado</p>
-            <p className="text-slate-300 italic">&ldquo;{analysis.ventVersion}&rdquo;</p>
-            <p className="text-xs text-slate-500 mt-2">Solte aqui. Sem se expor.</p>
+          <div className="card-mystic animate-in animate-in-delay-3" style={{ borderColor: "rgba(139, 92, 246, 0.2)" }}>
+            <p className="text-xs text-[var(--color-mystic-light)] tracking-wider uppercase mb-2" style={{ fontFamily: "'Cinzel', serif" }}>
+              ✦ Desabafo Privado
+            </p>
+            <p className="text-[var(--color-text)] text-sm leading-relaxed" style={{ fontFamily: "'Playfair Display', serif", fontStyle: "italic" }}>
+              &ldquo;{analysis.ventVersion}&rdquo;
+            </p>
+            <p className="text-[10px] text-[var(--color-text-dim)] mt-3">Solte aqui. Sem se expor.</p>
           </div>
 
-          {/* Exercise */}
-          <div className="card">
-            <p className="text-sm text-slate-400 mb-2">Exercício para agora</p>
-            <p className="text-white">{analysis.exercise}</p>
+          <div className="card-mystic animate-in animate-in-delay-4">
+            <p className="text-xs text-[var(--color-emerald)] tracking-wider uppercase mb-2" style={{ fontFamily: "'Cinzel', serif" }}>
+              Exercício para agora
+            </p>
+            <p className="text-[var(--color-text)] text-sm leading-relaxed">{analysis.exercise}</p>
           </div>
 
-          {/* Guidance */}
-          <div className="card border-brand-primary/20">
-            <p className="text-sm text-slate-400 mb-2">Proteja sua dignidade</p>
-            <p className="text-white font-medium">{analysis.guidance}</p>
+          <div className="card-gold text-center py-5 animate-in animate-in-delay-5">
+            <p className="text-xs text-[var(--color-gold)]/60 tracking-wider uppercase mb-2" style={{ fontFamily: "'Cinzel', serif" }}>
+              Proteja sua dignidade
+            </p>
+            <p className="text-[var(--color-gold-light)] font-medium" style={{ fontFamily: "'Playfair Display', serif", fontStyle: "italic" }}>
+              {analysis.guidance}
+            </p>
           </div>
 
-          <div className="flex gap-3">
-            <button onClick={() => router.push("/")} className="btn-primary flex-1">
-              Consegui segurar
+          <div className="flex gap-3 animate-in animate-in-delay-6">
+            <button onClick={() => router.push("/")} className="btn-mystic flex-1 text-center text-sm">
+              Consegui Segurar
             </button>
             <button
-              onClick={() => {
-                fetch(`/api/emergencia/relapse`, { method: "POST" });
-                router.push("/");
-              }}
-              className="btn-secondary flex-1 text-red-400"
+              onClick={() => { router.push("/"); }}
+              className="btn-secondary flex-1 text-center text-sm text-red-400"
             >
               Recaí mesmo assim
             </button>
