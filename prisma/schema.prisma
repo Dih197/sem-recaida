@@ -1,0 +1,467 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── AUTH (NextAuth compatible) ───────────────────────
+
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  name            String?
+  passwordHash    String?
+  image           String?
+  emailVerified   DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Onboarding profile
+  onboardingDone    Boolean   @default(false)
+  gender            Gender?
+  preference        Gender?
+  currentNeed       CurrentNeed?
+  timeSinceBreakup  TimeSince?
+  whoEnded          WhoEnded?
+  stillInContact    Boolean?
+  relapseCount      Int?
+  strongestPain     PainType?
+  hardestTime       TimeOfDay?
+
+  // Relapse tracking
+  lastRelapseAt   DateTime?
+  streakStartedAt DateTime?
+
+  // Subscription
+  stripeCustomerId    String?   @unique
+  subscriptionStatus  SubscriptionStatus @default(FREE)
+  subscriptionEndsAt  DateTime?
+
+  // Relations
+  accounts        Account[]
+  sessions        Session[]
+  checkIns        CheckIn[]
+  emergencyUses   EmergencyUse[]
+  recoveryPlans   UserRecoveryPlan[]
+  journalEntries  JournalEntry[]
+  realityEntries  RealityEntry[]
+  tarotReadings   TarotReading[]
+  progress        UserProgress?
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── DAILY CHECK-IN ──────────────────────────────────
+
+model CheckIn {
+  id             String       @id @default(cuid())
+  userId         String
+  createdAt      DateTime     @default(now())
+
+  feeling        Emotion
+  intensity      Int
+  trigger        String?
+  triggerType     TriggerType?
+  journalText    String?
+
+  // AI analysis
+  emotionSource  EmotionSource?
+  relapseRisk    RiskLevel?
+  actionStep     String?
+  holdingPhrase  String?
+
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+// ─── EMERGENCY BUTTON ────────────────────────────────
+
+model EmergencyUse {
+  id              String   @id @default(cuid())
+  userId          String
+  createdAt       DateTime @default(now())
+
+  draftMessage    String
+
+  // AI analysis
+  impulseSource   EmotionSource?
+  whyNotSend      String?
+  regretRisk      RiskLevel?
+  ventVersion     String?
+  exercise        String?
+  guidance        String?
+
+  relapsed        Boolean  @default(false)
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+// ─── RECOVERY PLANS ──────────────────────────────────
+
+model RecoveryPlanTemplate {
+  id          String   @id @default(cuid())
+  name        String
+  duration    Int
+  description String
+  targetNeed  CurrentNeed?
+  days        RecoveryDayTemplate[]
+  userPlans   UserRecoveryPlan[]
+}
+
+model RecoveryDayTemplate {
+  id          String   @id @default(cuid())
+  planId      String
+  dayNumber   Int
+  title       String
+  description String
+  actionText  String
+  plan        RecoveryPlanTemplate @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@unique([planId, dayNumber])
+}
+
+model UserRecoveryPlan {
+  id          String     @id @default(cuid())
+  userId      String
+  templateId  String
+  startedAt   DateTime   @default(now())
+  status      PlanStatus @default(ACTIVE)
+
+  days        UserRecoveryDay[]
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  template    RecoveryPlanTemplate @relation(fields: [templateId], references: [id])
+
+  @@index([userId, status])
+}
+
+model UserRecoveryDay {
+  id             String    @id @default(cuid())
+  userPlanId     String
+  dayNumber      Int
+  completedAt    DateTime?
+  skipped        Boolean   @default(false)
+  reflectionText String?
+
+  userPlan       UserRecoveryPlan @relation(fields: [userPlanId], references: [id], onDelete: Cascade)
+
+  @@unique([userPlanId, dayNumber])
+}
+
+// ─── GUIDED JOURNAL ──────────────────────────────────
+
+model JournalEntry {
+  id          String           @id @default(cuid())
+  userId      String
+  createdAt   DateTime         @default(now())
+
+  promptId    String?
+  promptText  String?
+  entryText   String
+  category    JournalCategory?
+
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+// ─── REALITY MODE ────────────────────────────────────
+
+model RealityEntry {
+  id          String      @id @default(cuid())
+  userId      String
+  createdAt   DateTime    @default(now())
+
+  entryType   RealityType
+  title       String?
+  description String
+  category    String?
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ─── TAROT ───────────────────────────────────────────
+
+model TarotReading {
+  id              String           @id @default(cuid())
+  userId          String
+  createdAt       DateTime         @default(now())
+
+  theme           TarotTheme
+  cardName        String
+  cardNumber      Int
+  isPremium       Boolean          @default(false)
+  readingType     TarotReadingType @default(DAILY)
+
+  // AI interpretation
+  mainEnergy      String?
+  centralMessage  String?
+  dailyAdvice     String?
+  alert           String?
+  shortPhrase     String?
+  fullReading     String?
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+// ─── SUPPORT LIBRARY ─────────────────────────────────
+
+model LibraryArticle {
+  id          String          @id @default(cuid())
+  slug        String          @unique
+  title       String
+  content     String
+  category    LibraryCategory
+  tags        String[]
+  sortOrder   Int             @default(0)
+  published   Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+// ─── PROGRESS / STATS ────────────────────────────────
+
+model UserProgress {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+
+  totalImpulsesBlocked  Int      @default(0)
+  totalCheckIns         Int      @default(0)
+  longestStreak         Int      @default(0)
+  currentStreak         Int      @default(0)
+
+  weeklyEmotions        Json?
+  dangerousHours        Json?
+  dangerousTriggers     Json?
+
+  lastWeeklySummary     String?
+  lastWeeklySummaryAt   DateTime?
+
+  updatedAt             DateTime @updatedAt
+
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── PAYMENTS ────────────────────────────────────────
+
+model Payment {
+  id                String        @id @default(cuid())
+  userId            String
+  stripePaymentId   String        @unique
+  amount            Int
+  currency          String        @default("brl")
+  status            PaymentStatus
+  productType       ProductType
+  createdAt         DateTime      @default(now())
+
+  @@index([userId])
+}
+
+// ─── ENUMS ───────────────────────────────────────────
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum CurrentNeed {
+  OVERCOME
+  STOP_RELAPSES
+  RECOVER_SELF_ESTEEM
+  UNDERSTAND_WORTH
+}
+
+enum TimeSince {
+  LESS_THAN_WEEK
+  ONE_TO_FOUR_WEEKS
+  ONE_TO_THREE_MONTHS
+  THREE_TO_SIX_MONTHS
+  MORE_THAN_SIX_MONTHS
+}
+
+enum WhoEnded {
+  ME
+  THEM
+  MUTUAL
+}
+
+enum TimeOfDay {
+  MORNING
+  AFTERNOON
+  NIGHT
+  DAWN
+}
+
+enum Emotion {
+  SAUDADE
+  TRISTEZA
+  RAIVA
+  CULPA
+  ANSIEDADE
+  SOLIDAO
+  ESPERANCA
+  ALIVIO
+  MEDO
+  CONFUSAO
+  INDIFERENCA
+  DETERMINACAO
+}
+
+enum EmotionSource {
+  SAUDADE
+  CARENCIA
+  CULPA
+  REJEICAO
+  APEGO
+  SOLIDAO
+  EGO_FERIDO
+  MEDO
+  DESESPERO
+  RAIVA
+  AMOR
+}
+
+enum TriggerType {
+  SAW_SOCIAL_MEDIA
+  RECEIVED_MESSAGE
+  MUTUAL_FRIEND
+  PLACE_MEMORY
+  SONG_MOVIE
+  LONELINESS
+  ALCOHOL
+  NIGHT_TIME
+  HOLIDAY_DATE
+  OTHER
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum PainType {
+  SAUDADE
+  REJEICAO
+  CULPA
+  SOLIDAO
+  INSEGURANCA
+  RAIVA
+  MEDO_FICAR_SO
+}
+
+enum PlanStatus {
+  ACTIVE
+  COMPLETED
+  ABANDONED
+}
+
+enum JournalCategory {
+  SAUDADE_VS_CARENCIA
+  AMOR_VS_APEGO
+  REAL_RELATIONSHIP
+  WHY_WANT_BACK
+  SELF_DISCOVERY
+  GRATITUDE
+  FREE
+}
+
+enum RealityType {
+  FACT
+  PATTERN
+  SUFFERING_MOMENT
+  IDEALIZATION
+}
+
+enum TarotTheme {
+  AMOR
+  AUTOESTIMA
+  CURA
+  RECOMECO
+  TRABALHO
+  GERAL
+}
+
+enum TarotReadingType {
+  DAILY
+  EXTRA
+  LOVE_DEEP
+  HEALING
+  SELF_ESTEEM
+  DETAILED
+}
+
+enum LibraryCategory {
+  RECAIDA
+  CARENCIA
+  SAUDADE
+  AUTOESTIMA
+  DESAPEGO
+  DIGNIDADE
+  STALKING
+  SELF_LOVE
+}
+
+enum SubscriptionStatus {
+  FREE
+  PREMIUM
+  CANCELED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum ProductType {
+  SUBSCRIPTION
+  TAROT_EXTRA
+  TAROT_DEEP_LOVE
+  TAROT_HEALING
+  TAROT_SELF_ESTEEM
+  TAROT_DETAILED
+}
