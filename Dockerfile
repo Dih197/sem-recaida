@@ -27,8 +27,17 @@ RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nextjs
 COPY --from=builder /app/apps/web/public ./apps/web/public
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client ./node_modules/@prisma/client
+COPY --from=builder /app/node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/.pnpm/prisma@5.22.0/node_modules/prisma ./node_modules/prisma
+COPY --from=builder /app/node_modules/.pnpm/@prisma+engines@5.22.0/node_modules/@prisma/engines ./node_modules/@prisma/engines
+
+COPY entrypoint.sh ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
+
 USER nextjs
 EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
-CMD ["node", "apps/web/server.js"]
+ENTRYPOINT ["./entrypoint.sh"]
